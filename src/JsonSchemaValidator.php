@@ -34,7 +34,7 @@ class JsonSchemaValidator
 
     public function error()
     {
-        return $this->error ? 'No errors';
+        return $this->error ? $this->error : 'No errors';
     }
 
 }

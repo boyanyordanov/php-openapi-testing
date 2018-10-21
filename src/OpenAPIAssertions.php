@@ -33,7 +33,7 @@ trait OpenAPIAssertions
     {
         $path = $this->replacePathParam($path);
         $response = $this->get($path);
-        $this->assertEquals(200, $this->, "Status code is not 200 for GET {$path}");
+        $this->assertEquals(200, $response->getStatusCode(), "Status code is not 200 for GET {$path}");
         $validator = new JsonSchemaValidator(json_decode($response->getContent()), $responseSchema);
         $error = $validator->error();
         $this->assertTrue($validator->passes(), "Failed to match schema to data on path: {$path}. Error: {$error}");
