@@ -3,6 +3,10 @@
 namespace OpenAPITestTools;
 
 
+use JsonSchema\Validator;
+use JSONSchemaFaker\Faker;
+use OpenAPITestTools\JsonSchemaValidator;
+
 trait OpenAPIAssertions
 {
     /**
@@ -17,7 +21,7 @@ trait OpenAPIAssertions
 
     protected function createFakeData($body)
     {
-        return (array)JSONSchemaFaker::fake($body);
+        return (array)Faker::fake($body);
     }
 
     /**
@@ -28,12 +32,11 @@ trait OpenAPIAssertions
     protected function assertGetResponseMatchesSchema($path, $responseSchema)
     {
         $path = $this->replacePathParam($path);
-        $response = $this->makeGetRequest($path);
+        $response = $this->get($path);
         $this->assertEquals(200, $this->, "Status code is not 200 for GET {$path}");
-        $validator = new Validator(json_decode($response->getContent()), $responseSchema);
-        $errors = $validator->errors();
-        $error = count($errors) > 0 ? array_first($errors)->getMessage() : 'No error';
-        $this->assertTrue($validator->passes(), "Failed to match schema to data on path: {$path}. Errors: {$error}");
+        $validator = new JsonSchemaValidator(json_decode($response->getContent()), $responseSchema);
+        $error = $validator->error();
+        $this->assertTrue($validator->passes(), "Failed to match schema to data on path: {$path}. Error: {$error}");
         return $response;
     }
 
